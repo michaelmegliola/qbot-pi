@@ -3,7 +3,7 @@ import time
 import math
 import numpy as np
 from GPIO_multi_stepper import *
-#from distancesensor_28byj import *
+from distancesensor_28byj import *
 
 ################################################################################
 #                                                                              #
@@ -15,7 +15,7 @@ from GPIO_multi_stepper import *
 
 class QHwBot_28byj(QBot):
     def __init__(self, sensor_sectors=4, turn_sectors=4):
-#        self.lidar = LidarSensor(sensor_sectors, 360/sensor_sectors)
+        self.lidar = LidarSensor(sensor_sectors, 360/sensor_sectors)
         self.sensor_sectors = sensor_sectors
         self.turn_sectors = turn_sectors
         self.pins = ((7,11,13,15),(31,33,35,37))
@@ -38,7 +38,9 @@ class QHwBot_28byj(QBot):
                 self.motors.doStep((1,1))
 
     def get_distance(self):
-        return self.lidar.get_observation()[...,1]
+#        return self.lidar.get_observation()[...,1]
+#         obs = [0 for x in range(self.sensor_sectors)]
+#         return obs
 
     def reset(self):
         pass
@@ -47,11 +49,4 @@ class QHwBot_28byj(QBot):
         return 100.0            # millimeters
 
 
-j = QHwBot_28byj()
-j.move(0)
-time.sleep(1)
-j.move(1)
-time.sleep(1)
-j.move(2)
-time.sleep(1)
 

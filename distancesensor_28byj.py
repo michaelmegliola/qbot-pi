@@ -1,6 +1,8 @@
 from GPIO_multi_stepper import *
 import numpy as np
 import VL53L1X
+import math
+import time
 
 ################################################################################
 #                                                                              #
@@ -44,16 +46,36 @@ class LidarSensor(DistanceSensor):
         super().__init__(sweep_count, sweep_degrees)
         self.lidar = VL53L1X.VL53L1X(i2c_bus=1, i2c_address=0x29)
         self.lidar.open() # Initialise the i2c bus and configure the sensor
-        self.pins = ((19,21,23,24))
+        self.pins = ((19,21,23,24),)
         self.motors = StepperMotors(self.pins,halfStepSequence, 0.0005)
 
     def seek_position(self, position):
+        print(position)
         current_lidar_pos = self.motors.positions[0]
-        for x in range(position//self.motors.degrees_per_step):
-            self.motors.doStep(1)
-        self.position += self.motors.positions[0] - current_lidar_pos
+        # store the position as an integer and it'll never drift
+        steps = math.floor((position-current_lidar_pos)/self.motors.degrees_per_step)
+        for x in range(steps):
+            if position > 0:
+                self.motors.doStep(((1),))
+            elif position < 0:
+                self.motors.dostep(((-1),))
+            else:
+                pass
+        self.position = self.motors.positions[0]
         return self.motors.positions[0]
 
 
 j = LidarSensor()
-j.seek_position(30)
+print('Seeking 30')
+j.seek_position(-30)
+time.sleep(1)
+print('Seeking 60')
+j.seek_position(60)
+time.sleep(1)
+print('Seeking 90')
+j.seek_position(90)
+time.sleep(1)
+print('Seeking 0')
+j.seek_position(0)
+time.sleep(1)
+
